@@ -2,20 +2,12 @@
 # Dummy Web Crawler
 # ============
 
-import requests
-
-# seed = "http://pudim.com.br/"
-# Dummy pages content
 def get_page_content(url) -> str:
-    if url == "https://desserts.com/index.html":
-        return 'Choose your favorite dessert! <a href="http://pudim.com.br"> <a href="https://gelly.com">'
-    elif url == "http://pudim.com.br":
-        return requests.get("http://pudim.com.br").text
-    elif url == "https://gelly.com":
-        return "<h1>Im a Gelly lovers page<\h1>"
-    else:
-        raise NotImplementedError(f"No valid return for url {url}")
-    # return requests.get(url).text
+    try:
+        import requests
+        return requests.get(url).text
+    except Exception as identifier:
+        return ""
 
 
 def get_next_target(page: str) -> tuple:
@@ -92,7 +84,9 @@ def lookup(index:list,keyword:str) -> list:
 
 
 if __name__ == "__main__":
+    seed = "https://udacity.github.io/cs101x/urank/"
     index = []
-    crawl_web('https://desserts.com/index.html')
+    crawl_web(seed)
     # print(index)
-    print(lookup(index, 'lovers'))
+    print(lookup(index, 'buttercream'))
+    print(lookup(index, 'hummus'))
