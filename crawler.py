@@ -1,11 +1,12 @@
 import requests
 
 seed = "http://pudim.com.br/"
-f = requests.get(seed)
-page = f.text
+
+def get_page_content(url):
+    return requests.get(url).text
 
 def get_next_target(page: str) -> tuple:
-    start_link = page.find('<a href=')
+    start_link = page.find('href=')
 
     # if the link tag sequence is not found, find returns a -1
     if start_link == -1:
@@ -30,5 +31,27 @@ def get_all_links(page: str) -> None:
             break
     return links
 
-print(get_all_links(page))
 
+def union(p: list, q: list) -> None:
+    '''Unites two lists by adding unique elements from the second to the first one.'''
+    for item in q:
+        if item not in p:
+            p.append(item)
+    return p
+
+def crawl_web(seed):
+    ''' Starts crawling pages from the seed using Depth-first Search'''
+    to_crawl =  [seed]
+    crawled = []
+    while to_crawl:
+        page = to_crawl.pop()
+        if page not in crawled:
+            print(page)
+            union(to_crawl, get_all_links(get_page_content(page)))
+            crawled.append(page)
+    return crawled
+
+# print(crawl(seed))
+crawl_web(seed)
+
+# print(get_all_links(get_page_content(seed)))
