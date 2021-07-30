@@ -39,16 +39,13 @@ index = [
 
 
 def add_to_index(index: list, keyword: str, url: str):
-    is_keywork_in_index = False
-
     for entry in index:
         # entry[0] = index[0] = dog
         if entry[0] == keyword:
             entry[1].append(url)
-            is_keywork_in_index = True
+            return
 
-    if not is_keywork_in_index:
-        index.append([keyword,[url]])
+    index.append([keyword,[url]])
 
 add_to_index(index, 'dog', 'https://thewhaledogs.co')
 add_to_index(index, 'whale', 'https://japanwhales.jp')
