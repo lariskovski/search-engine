@@ -6,7 +6,7 @@ def get_page_content(url) -> str:
     try:
         import requests
         return requests.get(url).text
-    except Exception as identifier:
+    except:
         return ""
 
 
