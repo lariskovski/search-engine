@@ -1,8 +1,8 @@
-# page = contents of a web page
-page = ('<div id="top_bin"><div id="top_content" class="width960">'
-'<div class="udacity float-left"><a href="http://udacity.com">')
+import requests
 
-# Example pages: https://br.udacity.com/course/intro-to-computer-science--cs101 or http://xkcd.com/353
+seed = "http://pudim.com.br/"
+f = requests.get(seed)
+page = f.text
 
 def get_next_target(page: str) -> tuple:
     start_link = page.find('<a href=')
