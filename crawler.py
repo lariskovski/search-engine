@@ -51,7 +51,21 @@ add_to_index(index, 'dog', 'https://thewhaledogs.co')
 add_to_index(index, 'whale', 'https://japanwhales.jp')
 # print(index)
 
+def add_page_to_index(index: list, url: str, content: str) -> list:
+    words = content.split()
+    for word in words:
+        is_word_in_keywords = False
+        for entry in index:
+            if word == entry[0]:
+                entry[1].append(url)
+                is_word_in_keywords = True
+        if not is_word_in_keywords:
+            index.append([word, [url]])
+    return index
 
+
+add_page_to_index(index, 'fake.test', 'This is a test')
+add_page_to_index(index, 'real.test', 'This is not a test')
 
 def lookup(index:list,keyword:str) -> list:
     for entry in index:
@@ -62,3 +76,4 @@ def lookup(index:list,keyword:str) -> list:
 
 print(lookup(index, 'dog'))
 print(lookup(index, 'giraffe'))
+print(lookup(index, 'This'))
