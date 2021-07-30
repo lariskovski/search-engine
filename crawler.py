@@ -58,8 +58,7 @@ def lookup(index:list,keyword:str) -> list:
         # entry[0] = index[0] = dog
         if entry[0] == keyword:
             return entry[1]
-        else:
-            return []
+    return []
 
 print(lookup(index, 'dog'))
 print(lookup(index, 'giraffe'))
