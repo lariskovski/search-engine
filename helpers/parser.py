@@ -20,8 +20,8 @@ def format_content(instance: object, raw_content: str) -> str:
     return formatted_content
 
 if __name__ == "__main__":
-    import requests
+    from utils import get_page_content
     url = 'https://udacity.github.io/cs101x/urank/'
-    page_content = requests.get(url).text
+    page_content = get_page_content(url)
     parser = PageParser()
     print(format_content(parser, page_content))
