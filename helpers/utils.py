@@ -1,9 +1,11 @@
+import logging
 
 def get_page_content(url) -> str:
     try:
         import requests
         return requests.get(url).text
     except:
+        logging.warn(f"Couldnt get content from address {url}")
         return ""
 
 def union(p: list, q: list) -> None:

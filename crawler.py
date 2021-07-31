@@ -1,3 +1,6 @@
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def crawl_web(seed):
     ''' Starts crawling pages from the seed using Depth-first Search'''
@@ -10,18 +13,17 @@ def crawl_web(seed):
 
     while to_crawl:
         page = to_crawl.pop()
+        logging.info(f"Crawling page: {page}")
         if page not in crawled:
-            try:
-                content = get_page_content(page)
-                '''HTML Formatter removes html tags for better keyword mapping.
-                   Passing content instead of the format_content(content) to add_page_to_index
-                   would still work but result in poluted index keywords i.e. containing html tags'''
-                add_page_to_index(index, page, format_content(PageParser(), content))
-                # add_page_to_index(index, page, content)
-                union(to_crawl, get_all_links(content))
-                crawled.append(page)
-            except Exception as e:
-                print(f"Couldnt get {page}", e)
+            content = get_page_content(page)
+            '''HTML Formatter removes html tags for better keyword mapping.
+                Passing content instead of the format_content(content) to add_page_to_index
+                would still work but result in poluted index keywords i.e. containing html tags'''
+            add_page_to_index(index, page, format_content(PageParser(), content))
+            links_on_page = get_all_links(content)
+            logging.info(f"Links found on page: {links_on_page}")
+            union(to_crawl, links_on_page)
+            crawled.append(page)
 
     return crawled
 
