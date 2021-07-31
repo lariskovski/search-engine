@@ -47,6 +47,7 @@ def union(p: list, q: list) -> None:
 
 def crawl_web(seed):
     ''' Starts crawling pages from the seed using Depth-first Search'''
+    from helpers.parser import PageParser, format_content
     to_crawl =  [seed]
     crawled = []
     while to_crawl:
@@ -54,7 +55,11 @@ def crawl_web(seed):
         if page not in crawled:
             try:
                 content = get_page_content(page)
-                add_page_to_index(index, page, content)
+                '''HTML Formatter removes html tags for better keyword mapping.
+                   Passing content instead of the format_content(content) to add_page_to_index
+                   would still work but result in poluted index keywords i.e. containing html tags'''
+                add_page_to_index(index, page, format_content(PageParser(), content))
+                # add_page_to_index(index, page, content)
                 union(to_crawl, get_all_links(content))
                 crawled.append(page)
             except Exception as e:
@@ -88,5 +93,10 @@ if __name__ == "__main__":
     index = []
     crawl_web(seed)
     # print(index)
+    # print(len(index))
+    # for entry in index:
+    #     print(entry)
+    #     print(entry[0])
     print(lookup(index, 'buttercream'))
     print(lookup(index, 'hummus'))
+    print(lookup(index, 'a'))
