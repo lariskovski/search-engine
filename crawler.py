@@ -1,12 +1,15 @@
+from helpers.utils import union, get_page_content, timer
 import logging
+
 
 logging.basicConfig(level=logging.INFO)
 
+
+@timer
 def crawl_web(seed):
     ''' Starts crawling pages from the seed using Depth-first Search'''
     from helpers.parser import PageParser, format_content
     from helpers.crawler import add_page_to_index, get_all_links
-    from helpers.utils import union, get_page_content
 
     to_crawl =  [seed]
     crawled = []
