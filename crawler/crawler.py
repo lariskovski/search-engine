@@ -25,16 +25,17 @@ def get_all_links(page: str) -> None:
             break
     return links
 
-def add_page_to_index(index: list, url: str, content: str) -> list:
+def add_to_index(index, keyword, url):
     import logging
+    if keyword in index:
+        index[keyword].append(url)
+    else:
+        logging.info(f"New keyword entry on {url}: {keyword}")
+        index[keyword] = [url]
+
+
+def add_page_to_index(index: list, url: str, content: str) -> list:
     words = content.split()
     for word in words:
-        is_word_in_keywords = False
-        for entry in index:
-            if word == entry[0]:
-                entry[1].append(url)
-                is_word_in_keywords = True
-        if not is_word_in_keywords:
-            logging.info(f"New keyword entry on {url}: {word}")
-            index.append([word, [url]])
+        add_to_index(index, word, url)
     return index

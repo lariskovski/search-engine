@@ -14,6 +14,8 @@ def crawl_web(seed):
     to_crawl =  [seed]
     crawled = []
 
+    index = {}
+    
     while to_crawl:
         page = to_crawl.pop()
         if page not in crawled:
@@ -28,23 +30,20 @@ def crawl_web(seed):
             union(to_crawl, links_on_page)
             crawled.append(page)
 
-    return crawled
+    logging.info(f"Index total size: {len(index)}")
+    return index
 
 
-def lookup(index:list,keyword:str) -> list:
-    for entry in index:
-        if entry[0] == keyword:
-            return entry[1]
+def lookup(index:list, keyword:str) -> list:
+    if keyword in index:
+        return index[keyword]
     return []
 
 
 if __name__ == "__main__":
     seed = "https://udacity.github.io/cs101x/urank/" # Couple links example
     # seed = "https://gutenberg.org/cache/epub/1661/pg1661.txt" # A lot of keywords example
-    index = []
-    crawl_web(seed)
-    logging.info(f"Index total size: {len(index)}")
-    # print(index)
+    index = crawl_web(seed)
     # print(lookup(index, 'buttercream'))
     # print(lookup(index, 'hummus'))
     # print(lookup(index, 'a'))
