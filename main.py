@@ -20,13 +20,14 @@ def crawl_web(seed):
         if page not in crawled:
             logging.info(f"Crawling page: {page}")
             content = get_page_content(page)
-            '''HTML Formatter removes html tags for better keyword mapping.
-                Passing content instead of the format_content(content) to add_page_to_index
-                would still work but result in poluted index keywords i.e. containing html tags'''
+
+            # formating content removes html tags
             add_page_to_index(index, page, format_content(PageParser(), content))
+            
             links_on_page = get_all_links(content)
             logging.info(f"Links found on page: {links_on_page}")
             union(to_crawl, links_on_page)
+            
             crawled.append(page)
 
     logging.info(f"Index total size: {len(index)}")

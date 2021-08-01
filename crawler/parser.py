@@ -14,6 +14,7 @@ class PageParser(HTMLParser):
 
 
 def format_content(instance: object, raw_content: str) -> str:
+    '''HTML Formatter removes html tags for string'''
     parser = PageParser()
     parser.feed(raw_content)
     formatted_content = " ".join(parser.clean_content)
