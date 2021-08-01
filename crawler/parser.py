@@ -1,6 +1,5 @@
 from html.parser import HTMLParser
 
-
 class PageParser(HTMLParser):
 
     def __init__(self):
@@ -19,9 +18,3 @@ def format_content(instance: object, raw_content: str) -> str:
     formatted_content = " ".join(parser.clean_content)
     return formatted_content
 
-if __name__ == "__main__":
-    from utils import get_page_content
-    url = 'https://udacity.github.io/cs101x/urank/'
-    page_content = get_page_content(url)
-    parser = PageParser()
-    print(format_content(parser, page_content))
