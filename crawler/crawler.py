@@ -26,6 +26,7 @@ def get_all_links(page: str) -> None:
     return links
 
 def add_page_to_index(index: list, url: str, content: str) -> list:
+    import logging
     words = content.split()
     for word in words:
         is_word_in_keywords = False
@@ -34,5 +35,6 @@ def add_page_to_index(index: list, url: str, content: str) -> list:
                 entry[1].append(url)
                 is_word_in_keywords = True
         if not is_word_in_keywords:
+            logging.info(f"New keyword entry on {url}: {word}")
             index.append([word, [url]])
     return index

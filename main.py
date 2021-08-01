@@ -16,8 +16,8 @@ def crawl_web(seed):
 
     while to_crawl:
         page = to_crawl.pop()
-        logging.info(f"Crawling page: {page}")
         if page not in crawled:
+            logging.info(f"Crawling page: {page}")
             content = get_page_content(page)
             '''HTML Formatter removes html tags for better keyword mapping.
                 Passing content instead of the format_content(content) to add_page_to_index
@@ -39,14 +39,12 @@ def lookup(index:list,keyword:str) -> list:
 
 
 if __name__ == "__main__":
-    seed = "https://udacity.github.io/cs101x/urank/"
+    seed = "https://udacity.github.io/cs101x/urank/" # Couple links example
+    # seed = "https://gutenberg.org/cache/epub/1661/pg1661.txt" # A lot of keywords example
     index = []
     crawl_web(seed)
+    logging.info(f"Index total size: {len(index)}")
     # print(index)
-    # print(len(index))
-    # for entry in index:
-    #     print(entry)
-    #     print(entry[0])
-    print(lookup(index, 'buttercream'))
-    print(lookup(index, 'hummus'))
-    print(lookup(index, 'a'))
+    # print(lookup(index, 'buttercream'))
+    # print(lookup(index, 'hummus'))
+    # print(lookup(index, 'a'))
