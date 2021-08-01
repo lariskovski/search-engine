@@ -23,7 +23,7 @@ def get_next_target(page: str) -> tuple:
     return url, end_quote
 
 
-def get_all_links(page: str) -> None:
+def get_all_links(page: str) -> list:
     links = []
     while True:
         url, endpos = get_next_target(page)
@@ -34,7 +34,7 @@ def get_all_links(page: str) -> None:
             break
     return links
 
-def add_to_index(index, keyword, url):
+def add_to_index(index: dict, keyword: str, url: str) -> None:
     if keyword in index:
         index[keyword].append(url)
     else:
@@ -42,7 +42,7 @@ def add_to_index(index, keyword, url):
         index[keyword] = [url]
 
 
-def add_page_to_index(index: list, url: str, content: str) -> list:
+def add_page_to_index(index: list, url: str, content: str) -> dict:
     words = content.split()
     for word in words:
         add_to_index(index, word, url)

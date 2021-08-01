@@ -5,7 +5,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 @timer
-def crawl_web(seed):
+def crawl_web(seed: str) -> dict:
     ''' Starts crawling pages from the seed using Depth-first Search'''
     from crawler.parser import PageParser, format_content, union
     from crawler.crawler import get_page_content, add_page_to_index, get_all_links
@@ -34,10 +34,10 @@ def crawl_web(seed):
     return index
 
 
-def lookup(index:list, keyword:str) -> list:
+def lookup(index:list, keyword:str) -> None:
     if keyword in index:
         return index[keyword]
-    return []
+    return None
 
 
 if __name__ == "__main__":

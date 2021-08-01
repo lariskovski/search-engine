@@ -21,7 +21,7 @@ def format_content(instance: object, raw_content: str) -> str:
     return formatted_content
 
 
-def union(p: list, q: list) -> None:
+def union(p: list, q: list) -> list:
     '''Unites two lists by adding unique elements from the second to the first one.'''
     for item in q:
         if item not in p:
