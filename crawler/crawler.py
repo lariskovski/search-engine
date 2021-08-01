@@ -1,3 +1,12 @@
+import logging
+
+def get_page_content(url) -> str:
+    try:
+        import requests
+        return requests.get(url).text
+    except:
+        logging.warn(f"Couldnt get content from address {url}")
+        return ""
 
 def get_next_target(page: str) -> tuple:
     start_link = page.find('href=')
@@ -26,7 +35,6 @@ def get_all_links(page: str) -> None:
     return links
 
 def add_to_index(index, keyword, url):
-    import logging
     if keyword in index:
         index[keyword].append(url)
     else:

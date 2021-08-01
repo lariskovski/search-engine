@@ -1,6 +1,5 @@
-from crawler.utils import union, get_page_content, timer
+from crawler.utils import timer
 import logging
-
 
 logging.basicConfig(level=logging.INFO)
 
@@ -8,8 +7,8 @@ logging.basicConfig(level=logging.INFO)
 @timer
 def crawl_web(seed):
     ''' Starts crawling pages from the seed using Depth-first Search'''
-    from crawler.parser import PageParser, format_content
-    from crawler.crawler import add_page_to_index, get_all_links
+    from crawler.parser import PageParser, format_content, union
+    from crawler.crawler import get_page_content, add_page_to_index, get_all_links
 
     to_crawl =  [seed]
     crawled = []
@@ -41,8 +40,8 @@ def lookup(index:list, keyword:str) -> list:
 
 
 if __name__ == "__main__":
-    seed = "https://udacity.github.io/cs101x/urank/" # Couple links example
-    # seed = "https://gutenberg.org/cache/epub/1661/pg1661.txt" # A lot of keywords example
+    # seed = "https://udacity.github.io/cs101x/urank/" # Couple links example
+    seed = "https://gutenberg.org/cache/epub/1661/pg1661.txt" # A lot of keywords example
     index = crawl_web(seed)
     # print(lookup(index, 'buttercream'))
     # print(lookup(index, 'hummus'))
