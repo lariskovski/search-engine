@@ -50,14 +50,11 @@ def union(p: list, q: list) -> list:
 
 logging.basicConfig(level=logging.INFO)
 
-import redis
-pool = redis.ConnectionPool(host='147.182.230.208', port=6379, db=0, decode_responses=True)
-r = redis.Redis(connection_pool=pool)
-
 @timer
 def crawl_web(seed: str) -> tuple:
     ''' Starts crawling pages from the seed using Depth-first Search'''
     from .indexer import add_page_to_index
+    from .common_redis_config import graph_hashtable
 
     to_crawl =  [seed]
     crawled = []
@@ -75,7 +72,7 @@ def crawl_web(seed: str) -> tuple:
             links_on_page = get_all_links(content)
             logging.info(f"Links found on page: {links_on_page}")
 
-            r.hset("graph", page, str(links_on_page))
+            graph_hashtable.hset("graph", page, str(links_on_page))
 
             union(to_crawl, links_on_page)
             
