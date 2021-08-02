@@ -3,6 +3,10 @@
 The project gets on how search engines work by building on from scratch in learning Python while having fun.
 Based on [Udacity Intro to Computer Science](https://classroom.udacity.com/courses/cs101) course.
 
+## Requirements
+
+- Python >= 3.8
+
 ## Course Main Topics
 
     - Variables
@@ -34,6 +38,15 @@ The first one makes very clear how the engine's crawler goes from one page to an
 While the second is better at showing how the engine indexes new keywords.
 Both are pretty good exemplifing the searches.
 
+## Running Locally
+
+~~~~
+# Start pipenv in root dir
+pipenv shell
+# Install Pipfile dependencies
+pipenv install
+
+~~~~
 
 ## Sources
 
