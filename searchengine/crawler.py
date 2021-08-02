@@ -1,4 +1,6 @@
+from .utils import timer
 import logging
+
 
 def get_page_content(url) -> str:
     try:
@@ -7,6 +9,7 @@ def get_page_content(url) -> str:
     except:
         logging.warn(f"Couldnt get content from address {url}")
         return ""
+
 
 def get_next_target(page: str) -> tuple:
     start_link = page.find('href=')
@@ -34,16 +37,33 @@ def get_all_links(page: str) -> list:
             break
     return links
 
-def add_to_index(index: dict, keyword: str, url: str) -> None:
-    if keyword in index:
-        index[keyword].append(url)
-    else:
-        logging.info(f"New keyword entry on {url}: {keyword}")
-        index[keyword] = [url]
+logging.basicConfig(level=logging.INFO)
 
+@timer
+def crawl_web(seed: str) -> dict:
+    ''' Starts crawling pages from the seed using Depth-first Search'''
+    from .parser import PageParser, format_content, union
+    from .indexer import add_page_to_index
 
-def add_page_to_index(index: list, url: str, content: str) -> dict:
-    words = content.split()
-    for word in words:
-        add_to_index(index, word, url)
+    to_crawl =  [seed]
+    crawled = []
+
+    index = {}
+    
+    while to_crawl:
+        page = to_crawl.pop()
+        if page not in crawled:
+            logging.info(f"Crawling page: {page}")
+            content = get_page_content(page)
+
+            # formating content removes html tags
+            add_page_to_index(index, page, format_content(PageParser(), content))
+            
+            links_on_page = get_all_links(content)
+            logging.info(f"Links found on page: {links_on_page}")
+            union(to_crawl, links_on_page)
+            
+            crawled.append(page)
+
+    logging.info(f"Index total size: {len(index)}")
     return index
