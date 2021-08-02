@@ -40,7 +40,7 @@ def get_all_links(page: str) -> list:
 logging.basicConfig(level=logging.INFO)
 
 @timer
-def crawl_web(seed: str) -> dict:
+def crawl_web(seed: str) -> tuple:
     ''' Starts crawling pages from the seed using Depth-first Search'''
     from .parser import PageParser, format_content, union
     from .indexer import add_page_to_index
@@ -49,6 +49,8 @@ def crawl_web(seed: str) -> dict:
     crawled = []
 
     index = {}
+
+    graph = {} # used for ranking
     
     while to_crawl:
         page = to_crawl.pop()
@@ -58,12 +60,16 @@ def crawl_web(seed: str) -> dict:
 
             # formating content removes html tags
             add_page_to_index(index, page, format_content(PageParser(), content))
-            
+
             links_on_page = get_all_links(content)
             logging.info(f"Links found on page: {links_on_page}")
+
+            graph[page] = links_on_page
+
+            # include unique links found on page to queue
             union(to_crawl, links_on_page)
             
             crawled.append(page)
 
     logging.info(f"Index total size: {len(index)}")
-    return index
+    return index, graph
