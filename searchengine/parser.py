@@ -8,8 +8,15 @@ class PageParser(HTMLParser):
 
 
     def handle_data(self, data):
-        data = data.strip()
+        # import translate # C code library
+        # import string
         if data != '':
+            # Translate function removes all punctuation. Installation: pip install translate
+            # PROS: reduces drastically index keyword count
+            # CONS: breaks http urls intended to be represented as text (even removing only dots)
+            # data = data.strip().lower().translate(str.maketrans('', '', string.punctuation))
+
+            data = data.strip().lower()
             self.clean_content.append(data)
 
 
