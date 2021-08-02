@@ -24,6 +24,10 @@ def get_next_target(page: str) -> tuple:
     end_quote = page.find('"', start_quote + 1)
     url = page[start_quote + 1 : end_quote]
     return url, end_quote
+    # if '?' not in url:
+    #     return url, end_quote
+    # else:
+    #     return None, 0
 
 
 def get_all_links(page: str) -> list:
@@ -46,6 +50,10 @@ def union(p: list, q: list) -> list:
 
 logging.basicConfig(level=logging.INFO)
 
+import redis
+pool = redis.ConnectionPool(host='147.182.230.208', port=6379, db=0, decode_responses=True)
+r = redis.Redis(connection_pool=pool)
+
 @timer
 def crawl_web(seed: str) -> tuple:
     ''' Starts crawling pages from the seed using Depth-first Search'''
@@ -56,8 +64,6 @@ def crawl_web(seed: str) -> tuple:
 
     index = {}
 
-    graph = {} # used for ranking
-    
     while to_crawl:
         page = to_crawl.pop()
         if page not in crawled:
@@ -69,12 +75,11 @@ def crawl_web(seed: str) -> tuple:
             links_on_page = get_all_links(content)
             logging.info(f"Links found on page: {links_on_page}")
 
-            graph[page] = links_on_page
+            r.hset("graph", page, str(links_on_page))
 
-            # include unique links found on page to queue
             union(to_crawl, links_on_page)
             
             crawled.append(page)
 
     logging.info(f"Index total size: {len(index)}")
-    return index, graph
+    return index
