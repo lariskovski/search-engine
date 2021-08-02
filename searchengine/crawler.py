@@ -58,8 +58,7 @@ def crawl_web(seed: str) -> tuple:
             logging.info(f"Crawling page: {page}")
             content = get_page_content(page)
 
-            # formating content removes html tags
-            add_page_to_index(index, page, format_content(PageParser(), content))
+            add_page_to_index(index, page, content)
 
             links_on_page = get_all_links(content)
             logging.info(f"Links found on page: {links_on_page}")
