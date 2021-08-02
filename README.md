@@ -24,3 +24,5 @@ Based on [Udacity Intro to Computer Science](https://classroom.udacity.com/cours
 ## Sources
 
 [Web Crawling vs Web Scraping](https://blog.apify.com/what-is-web-scraping/)
+
+[Documenting Python Code](https://realpython.com/documenting-python-code/)
