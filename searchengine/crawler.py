@@ -37,12 +37,18 @@ def get_all_links(page: str) -> list:
             break
     return links
 
+def union(p: list, q: list) -> list:
+    '''Unites two lists by adding unique elements from the second to the first one.'''
+    for item in q:
+        if item not in p:
+            p.append(item)
+    return p
+
 logging.basicConfig(level=logging.INFO)
 
 @timer
 def crawl_web(seed: str) -> tuple:
     ''' Starts crawling pages from the seed using Depth-first Search'''
-    from .parser import union
     from .indexer import add_page_to_index
 
     to_crawl =  [seed]

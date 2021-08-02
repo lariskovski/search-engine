@@ -18,11 +18,3 @@ class PageParser(HTMLParser):
         self.feed(raw_content)
         formatted_content = " ".join(self.clean_content)
         return formatted_content
-
-
-def union(p: list, q: list) -> list:
-    '''Unites two lists by adding unique elements from the second to the first one.'''
-    for item in q:
-        if item not in p:
-            p.append(item)
-    return p
