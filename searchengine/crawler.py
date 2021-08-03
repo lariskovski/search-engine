@@ -22,11 +22,20 @@ channel     = connection.channel()
 
 logging.basicConfig(level=logging.INFO)
 
+def publish_to_queue(channel: str, queue: str, message: list) -> None:
+    '''Publishes message on given channel/queue'''
+    channel.queue_declare(queue=queue)
+    channel.basic_publish(exchange='',
+                          routing_key=queue,
+                          body=json.dumps(message))
+
 
 @timer
 def crawl_web(seed: str) -> None:
     from crawler_helper.utils import get_all_links, get_next_target, get_page_content, union
-    ''' Starts crawling pages from the seed using Depth-first Search'''
+    ''' Starts crawling pages from the given seed using Depth-first Search.
+        It's the starting point for the Search Engine System assyncronously feeding the indexer and graphthrough queues.
+    '''
 
     to_crawl =  [seed]
     crawled  = []
@@ -41,19 +50,13 @@ def crawl_web(seed: str) -> None:
             content = get_page_content(page)
 
             # Index Queue
-            channel.queue_declare(queue=RABBITMQ_INDEX_QUEUE)
-            channel.basic_publish(exchange='',
-                                  routing_key=RABBITMQ_INDEX_QUEUE,
-                                  body=json.dumps([page, content]))
+            publish_to_queue(channel, RABBITMQ_INDEX_QUEUE, [page, content])
 
             links_on_page = get_all_links(content)
             logging.info(f"Links found on page: {links_on_page}")
 
             # Graph Queue
-            channel.queue_declare(queue=RABBITMQ_GRAPH_QUEUE)
-            channel.basic_publish(exchange='',
-                                  routing_key=RABBITMQ_GRAPH_QUEUE,
-                                  body=json.dumps([page, links_on_page]))
+            publish_to_queue(channel, RABBITMQ_GRAPH_QUEUE, [page, links_on_page])
 
             union(to_crawl, links_on_page)
             crawled.append(page)
