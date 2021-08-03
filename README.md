@@ -130,3 +130,5 @@ curl -X POST localhost:5000 -d "param1=value1&param2=this is value2"
 [Web Crawling vs Web Scraping](https://blog.apify.com/what-is-web-scraping/)
 
 [Documenting Python Code](https://realpython.com/documenting-python-code/)
+
+[Python dotenv](https://www.nylas.com/blog/making-use-of-environment-variables-in-python/)
