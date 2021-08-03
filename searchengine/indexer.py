@@ -1,41 +1,54 @@
+from dotenv import load_dotenv, find_dotenv
 from flask import Flask, request
 import logging
-import redis
+import pymongo
+import json
 import os
 
-from dotenv import load_dotenv, find_dotenv
 
-# REDIS envs
+# RabbitMQ envs
 load_dotenv(find_dotenv())
-REDIS_HOST =  os.getenv('REDIS_HOST')
+MONGODB_COLLECTION = os.getenv('MONGODB_COLLECTION')
+MONGODB_CLUSTER    = os.getenv('MONGODB_CLUSTER')
+MONGODB_DB_NAME    = os.getenv('MONGODB_DB_NAME')
+MONGODB_USER       = os.getenv('MONGODB_USER')
+MONGODB_PASS       = os.getenv('MONGODB_PASS')
 
-pool = redis.ConnectionPool(host=REDIS_HOST, port=6379, db=1, decode_responses=True)
-index = redis.Redis(connection_pool=pool)
 
-def add_to_index(index: dict, keyword: str, url: str) -> None:
-    from helper.utils import str_to_list
-    '''Adds keyword and correspondent url to index hashtable'''
-    # Check if keyword is already in index
-    result = index.hget("index", keyword)
-    if result == None:
-        # Add new entry to index
-        index.hset("index", keyword, url)
-        # logging.info(f"New keyword: {keyword}")
+# RabbitMQ configs
+try:
+    client     = pymongo.MongoClient(f"mongodb+srv://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_CLUSTER}/")
+    db         = client[MONGODB_DB_NAME]
+    collection = db[MONGODB_COLLECTION]
+    print('Successfully set up a database handle')
+except ServerSelectionTimeoutError as e:
+    stderr.write(f"Could not connect to MongoDB: {e}")
+
+
+def add_to_index(keyword: str, url: str) -> None:
+    ''' Adds keyword and correspondent url to index hashtable if its not there'''
+
+    response = collection.find_one({"keyword": keyword}) # if not found -> None
+    
+    if response == None:
+        data   = {'keyword' : keyword, 'urls' : [u for u in url] }
+        result = collection.insert_one(data)
+        # return {result.inserted_id}
     else:
-        # Update keyword urls list
-        updated_url_list = str_to_list(result).append(url)
-        formatted_list_into_str = str(updated_url_list)
-        index.hset("index", keyword, formatted_list_into_str)
+        # addToSet only adds if it doesnt exist
+        result = collection.update_one({"keyword": keyword}, {"$addToSet": {"urls": url}})
 
 
-def add_page_to_index(index: list, url: str, content: str) -> dict:
+def add_page_to_index(url: str, content: str) -> None:
     from helper.parser import PageParser
     '''Formats all page content to no-HTML-tags text and passes each word into add_to_index()'''
+
     parser = PageParser()
-    words = parser.format_content(content).split()
+    words  = parser.format_content(content).split()
+
     for word in words:
-        add_to_index(index, word, url)
-    return index
+        add_to_index(word, url)
+    # return index
 
 
 if __name__ == "__main__":
@@ -43,13 +56,12 @@ if __name__ == "__main__":
 
     @app.route('/', methods = ['POST'])
     def populate_index():
-        data = request.form 
-        page = data['page']
-        content = data['content']
-        add_page_to_index(index, page, content)
+        data    = request.form 
+        add_page_to_index(data['page'],  data['content'])
         return data
 
     @app.route('/index', methods = ['GET'])
-    def get_index():
-        return index.hgetall('index')
+    def get_index_size():
+        return str(collection.count_documents({}))
+    
     app.run(host="0.0.0.0", port=5000, debug=True)
