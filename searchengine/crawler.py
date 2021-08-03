@@ -9,18 +9,19 @@ import os
 load_dotenv(find_dotenv())
 RABBITMQ_INDEX_QUEUE =  os.getenv('RABBITMQ_INDEX_QUEUE')
 RABBITMQ_GRAPH_QUEUE =  os.getenv('RABBITMQ_GRAPH_QUEUE')
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
-RABBITMQ_USER = os.getenv('RABBITMQ_USER')
-RABBITMQ_PASS = os.getenv('RABBITMQ_PASS')
+RABBITMQ_HOST        = os.getenv('RABBITMQ_HOST')
+RABBITMQ_USER        = os.getenv('RABBITMQ_USER')
+RABBITMQ_PASS        = os.getenv('RABBITMQ_PASS')
 
-# Rabbit Setup
+# RabbitMQ setup
 credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASS)
-parameters = pika.ConnectionParameters(RABBITMQ_HOST, 5672, '/', credentials)
-connection = pika.BlockingConnection(parameters)
-channel = connection.channel()
+parameters  = pika.ConnectionParameters(RABBITMQ_HOST, 5672, '/', credentials)
+connection  = pika.BlockingConnection(parameters)
+channel     = connection.channel()
 
 
 logging.basicConfig(level=logging.INFO)
+
 
 @timer
 def crawl_web(seed: str) -> None:
@@ -28,7 +29,7 @@ def crawl_web(seed: str) -> None:
     ''' Starts crawling pages from the seed using Depth-first Search'''
 
     to_crawl =  [seed]
-    crawled = []
+    crawled  = []
 
     while to_crawl:
 
