@@ -8,6 +8,8 @@ redis = "*"
 pika = "*"
 flask = "*"
 python-dotenv = "*"
+pymongo = "*"
+dnspython = "*"
 
 [dev-packages]
 
