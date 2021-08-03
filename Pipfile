@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 redis = "*"
 pika = "*"
+flask = "*"
 
 [dev-packages]
 
