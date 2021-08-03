@@ -1,8 +1,16 @@
-from helper.redis_common_config import redis_conn as index
 from flask import Flask, request
 import logging
 import redis
+import os
 
+from dotenv import load_dotenv, find_dotenv
+
+# REDIS envs
+load_dotenv(find_dotenv())
+REDIS_HOST =  os.getenv('REDIS_HOST')
+
+pool = redis.ConnectionPool(host=REDIS_HOST, port=6379, db=1, decode_responses=True)
+index = redis.Redis(connection_pool=pool)
 
 def add_to_index(index: dict, keyword: str, url: str) -> None:
     from helper.utils import str_to_list
@@ -12,6 +20,7 @@ def add_to_index(index: dict, keyword: str, url: str) -> None:
     if result == None:
         # Add new entry to index
         index.hset("index", keyword, url)
+        # logging.info(f"New keyword: {keyword}")
     else:
         # Update keyword urls list
         updated_url_list = str_to_list(result).append(url)
