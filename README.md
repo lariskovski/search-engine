@@ -66,6 +66,15 @@ redis-cli
 hgetall graph
 ~~~~
 
+test.py
+~~~~
+import redis
+pool = redis.ConnectionPool(host='hostname', port=6379, db=1, decode_responses=True)
+hashtable = redis.Redis(connection_pool=pool)
+
+hashtable.hset("index", "keyword1", "value1")
+~~~~
+
 ### RabbitMQ
 
 ~~~~
@@ -80,6 +89,40 @@ docker run -d \
     docker.io/bitnami/rabbitmq:3.8
 # Acess http://do.larissa.tech:15672/
 # user/bitnami
+~~~~
+
+test.py
+~~~~
+import pika
+
+
+credentials = pika.PlainCredentials('user', 'pass')
+parameters = pika.ConnectionParameters('localhost',
+                                   5672,
+                                   '/',
+                                   credentials)
+
+connection = pika.BlockingConnection(parameters)
+
+channel = connection.channel()
+
+channel.queue_declare(queue='hello')
+
+
+channel.basic_publish(exchange='',
+                      routing_key='hello',
+                      body='Hello World!')
+
+print(" [x] Sent 'Hello World!'")
+
+connection.close()
+~~~~
+
+# Testing Endpoints
+
+~~~~
+# Flask post
+curl -X POST localhost:5000 -d "param1=value1&param2=this is value2"
 ~~~~
 
 ## Sources
