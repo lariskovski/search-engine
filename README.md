@@ -87,7 +87,7 @@ docker run -d \
     --restart=always \
     --hostname rabbitmq-master \
     docker.io/bitnami/rabbitmq:3.8
-# Acess http://do.larissa.tech:15672/
+# Acess http://hostname:15672/
 # user/bitnami
 ~~~~
 
