@@ -14,13 +14,11 @@ MONGODB_DB_NAME    = os.getenv('MONGODB_DB_NAME')
 MONGODB_USER       = os.getenv('MONGODB_USER')
 MONGODB_PASS       = os.getenv('MONGODB_PASS')
 
-
 # RabbitMQ configs
 try:
     client     = pymongo.MongoClient(f"mongodb+srv://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_CLUSTER}/")
     db         = client[MONGODB_DB_NAME]
     collection = db[MONGODB_COLLECTION]
-    print('Successfully set up a database handle')
 except ServerSelectionTimeoutError as e:
     stderr.write(f"Could not connect to MongoDB: {e}")
 
@@ -31,12 +29,13 @@ def add_to_index(keyword: str, url: str) -> None:
     response = collection.find_one({"keyword": keyword}) # if not found -> None
     
     if response == None:
-        data   = {'keyword' : keyword, 'urls' : [u for u in url] }
+        # Adds new keyword entry to index
+        data   = { 'keyword': keyword, 'urls' : [u for u in url] }
         result = collection.insert_one(data)
-        # return {result.inserted_id}
     else:
-        # addToSet only adds if it doesnt exist
-        result = collection.update_one({"keyword": keyword}, {"$addToSet": {"urls": url}})
+        # Append to existing keyword urls list
+        result = collection.update_one({ "keyword": keyword },
+                                       { "$addToSet": { "urls": url } }) # addToSet only adds if entry doesnt exist
 
 
 def add_page_to_index(url: str, content: str) -> None:
@@ -48,7 +47,6 @@ def add_page_to_index(url: str, content: str) -> None:
 
     for word in words:
         add_to_index(word, url)
-    # return index
 
 
 if __name__ == "__main__":
@@ -56,12 +54,13 @@ if __name__ == "__main__":
 
     @app.route('/', methods = ['POST'])
     def populate_index():
-        data    = request.form 
-        add_page_to_index(data['page'],  data['content'])
+        data = request.form 
+        add_page_to_index(data['page'], data['content'])
         return data
 
     @app.route('/index', methods = ['GET'])
     def get_index_size():
-        return str(collection.count_documents({}))
+        index_size = str(collection.count_documents({}))
+        return index_size
     
     app.run(host="0.0.0.0", port=5000, debug=True)
