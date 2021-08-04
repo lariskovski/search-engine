@@ -10,10 +10,10 @@ logging.basicConfig(level=logging.INFO)
 
 # RabbitMQ env
 load_dotenv(find_dotenv())
-RABBITMQ_GRAPH_QUEUE = os.getenv('RABBITMQ_GRAPH_QUEUE')
-RABBITMQ_HOST        = os.getenv('RABBITMQ_HOST')
-RABBITMQ_USER        = os.getenv('RABBITMQ_USER')
-RABBITMQ_PASS        = os.getenv('RABBITMQ_PASS')
+RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE')
+RABBITMQ_HOST  = os.getenv('RABBITMQ_HOST')
+RABBITMQ_USER  = os.getenv('RABBITMQ_USER')
+RABBITMQ_PASS  = os.getenv('RABBITMQ_PASS')
 
 # MongoDB env
 MONGODB_COLLECTION = os.getenv('MONGODB_COLLECTION')
@@ -59,10 +59,10 @@ def main():
     connection  = pika.BlockingConnection(parameters)
     channel     = connection.channel()
 
-    channel.queue_declare(queue=RABBITMQ_GRAPH_QUEUE)
+    channel.queue_declare(queue=RABBITMQ_QUEUE)
 
     # Queue consuming config
-    channel.basic_consume(queue=RABBITMQ_GRAPH_QUEUE,
+    channel.basic_consume(queue=RABBITMQ_QUEUE,
                           on_message_callback=callback,
                           auto_ack=True)
 

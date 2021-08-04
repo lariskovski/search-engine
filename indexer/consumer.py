@@ -9,11 +9,11 @@ logging.basicConfig(level=logging.INFO)
 
 # RabbitMQ config
 load_dotenv(find_dotenv())
-RABBITMQ_INDEX_QUEUE = os.getenv('RABBITMQ_INDEX_QUEUE')
-INDEXER_API_URL      = os.getenv('INDEXER_API_URL')
-RABBITMQ_HOST        = os.getenv('RABBITMQ_HOST')
-RABBITMQ_USER        = os.getenv('RABBITMQ_USER')
-RABBITMQ_PASS        = os.getenv('RABBITMQ_PASS')
+INDEXER_API_URL = os.getenv('INDEXER_API_URL')
+RABBITMQ_QUEUE  = os.getenv('RABBITMQ_QUEUE')
+RABBITMQ_HOST   = os.getenv('RABBITMQ_HOST')
+RABBITMQ_USER   = os.getenv('RABBITMQ_USER')
+RABBITMQ_PASS   = os.getenv('RABBITMQ_PASS')
 
 
 def callback(ch, method, properties, body):
@@ -47,10 +47,10 @@ def main():
     connection  = pika.BlockingConnection(parameters)
     channel     = connection.channel()
 
-    channel.queue_declare(queue=RABBITMQ_INDEX_QUEUE)
+    channel.queue_declare(queue=RABBITMQ_QUEUE)
 
     # Queue consuming config
-    channel.basic_consume(queue=RABBITMQ_INDEX_QUEUE,
+    channel.basic_consume(queue=RABBITMQ_QUEUE,
                           on_message_callback=callback,
                           auto_ack=True)
 

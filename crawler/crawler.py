@@ -1,5 +1,5 @@
-from crawler_helper.timer import timer
 from dotenv import load_dotenv, find_dotenv
+from helper.timer import timer
 import logging
 import json
 import pika
@@ -32,7 +32,7 @@ def publish_to_queue(channel: str, queue: str, message: list) -> None:
 
 @timer
 def crawl_web(seed: str) -> None:
-    from crawler_helper.utils import get_all_links, get_next_target, get_page_content, union
+    from helper.utils import get_all_links, get_next_target, get_page_content, union
     ''' Starts crawling pages from the given seed using Depth-first Search.
         It's the starting point for the Search Engine System assyncronously feeding the indexer and graphthrough queues.
     '''
