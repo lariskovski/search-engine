@@ -1,7 +1,6 @@
 from searchengine.crawler import crawl_web
 from searchengine.searcher import lookup, lookup_best
 from searchengine.ranker import compute_ranks
-from searchengine.common_redis_config import graph_hashtable, str_to_list, format_redis_dict
 
 
 # print(format_redis_dict(r.hgetall('graph')))
