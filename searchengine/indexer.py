@@ -14,7 +14,7 @@ MONGODB_DB_NAME    = os.getenv('MONGODB_DB_NAME')
 MONGODB_USER       = os.getenv('MONGODB_USER')
 MONGODB_PASS       = os.getenv('MONGODB_PASS')
 
-# RabbitMQ configs
+# Mongodb configs
 try:
     client     = pymongo.MongoClient(f"mongodb+srv://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_CLUSTER}/")
     db         = client[MONGODB_DB_NAME]
