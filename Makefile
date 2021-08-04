@@ -10,7 +10,7 @@ cindex:
 	@python indexer/consumer.py
 
 cgraph:
-	@python consumers/consumer_graph.py
+	@python graph/consumer.py
 
 crawler: 
 	@python crawler/crawler.py
