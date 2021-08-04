@@ -6,7 +6,7 @@ import json
 import os
 
 
-# RabbitMQ envs
+# MongoDB envs
 load_dotenv(find_dotenv())
 MONGODB_COLLECTION = os.getenv('MONGODB_COLLECTION')
 MONGODB_CLUSTER    = os.getenv('MONGODB_CLUSTER')
@@ -14,7 +14,7 @@ MONGODB_DB_NAME    = os.getenv('MONGODB_DB_NAME')
 MONGODB_USER       = os.getenv('MONGODB_USER')
 MONGODB_PASS       = os.getenv('MONGODB_PASS')
 
-# Mongodb configs
+# MongoDB config
 try:
     client     = pymongo.MongoClient(f"mongodb+srv://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_CLUSTER}/")
     db         = client[MONGODB_DB_NAME]
