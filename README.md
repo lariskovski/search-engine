@@ -55,9 +55,7 @@ mkdir redis ; cd redis
 wget https://raw.githubusercontent.com/antirez/redis/4.0/redis.conf
 sed -i 's/bind 127.0.0.1/bind 0.0.0.0/g'  redis.conf
 chmod 644 redis.conf
-docker network create search-engine
 docker run --rm -d \
-    --network search-engine \
     -v $(pwd)/redis.conf:/etc/redis.conf \
     -p 6379:6379 \
     redis:6.2-alpine redis-server /etc/redis.conf
