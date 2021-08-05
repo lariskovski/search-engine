@@ -1,4 +1,5 @@
 from dotenv import load_dotenv, find_dotenv
+from flask import Flask, request
 import requests, json
 import os, time
 import logging
@@ -65,10 +66,24 @@ def lookup_best(keyword: str) -> str:
         logging.debug(f"Found rank for {url}: {rank}")
     
     # Sorts and returns best ranked page for the provided keyword
-    sorted_ranked_urls = {k: v for k, v in sorted(unsorted_ranked_urls.items(), key=lambda item: item[1])}
-    best_ranked        = sorted_ranked_urls.popitem()
+    sorted_ranked_urls   = {k: v for k, v in sorted(unsorted_ranked_urls.items(), key=lambda item: item[1])}
+    best_ranked_url = sorted_ranked_urls.popitem()[0] # pop returns a list [ url, rank ]
 
-    return best_ranked
+    return best_ranked_url
+
 
 if __name__ == "__main__":
-    print(lookup_best("hummus"))
+    
+    app = Flask(__name__)
+
+    @app.route('/search', methods = ['GET'])
+    def get_best_url():
+        # curl localhost:5000/rank?page=https://udacity.github.io/cs101x/urank/nickel.html
+        keyword = request.args['keyword']
+        data = {
+                "keyword": keyword,
+                "best_ranked_url": lookup_best(keyword)
+                }
+        return json.dumps(data)
+
+    app.run(host="0.0.0.0", port=6000, debug=True)
