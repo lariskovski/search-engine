@@ -1,4 +1,4 @@
-.PHONY: consumers indexer searchengine crawler
+.PHONY:  indexer crawler searcher ranker graph
 
 all:
 	@echo "hello"
@@ -11,6 +11,13 @@ cindex:
 
 cgraph:
 	@python graph/consumer.py
+
+ranker:
+	@python ranker/ranker.py
+	@python ranker/api.py
+
+searcher:
+	@python searcher/searcher_api.py
 
 crawler: 
 	@python crawler/crawler.py
