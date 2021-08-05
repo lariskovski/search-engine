@@ -77,5 +77,22 @@ if __name__ == "__main__":
     def get_index_size():
         index_size = str(collection.count_documents({}))
         return index_size
-    
+
+    @app.route('/url', methods = ['GET'])
+    def get_urls_for_keyword():
+        # curl localhost:5000/url?keyword=hummus
+        keyword = request.args['keyword']
+        response = collection.find_one({"keyword": keyword}) # if not found -> None
+        if response != None:
+            urls = response["urls"]
+            data = {
+                    "keyword": keyword,
+                    "urls": [url for url in urls if len(urls) > 1 ]
+                    }
+            return json.dumps(data)
+        else:
+            logging.critical(f"No match found for keyword {keyword}")
+            return json.dumps({'message': 'no match'})
+
+
     app.run(host="0.0.0.0", port=5000, debug=True)
