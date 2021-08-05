@@ -1,23 +1,23 @@
-.PHONY:  indexer crawler searcher ranker graph
+.PHONY:  index crawler search rank graph
 
 all:
 	@echo "hello"
 
 index: 
-	@python indexer/indexer.py
+	@python index/indexer_api.py
 
 cindex: 
-	@python indexer/consumer.py
+	@python index/consumer.py
 
 cgraph:
 	@python graph/consumer.py
 
 ranker:
-	@python ranker/ranker.py
-	@python ranker/api.py
+	@python rank/ranker.py
+	@python rank/ranker_api.py
 
 searcher:
-	@python searcher/searcher_api.py
+	@python search/searcher_api.py
 
 crawler: 
 	@python crawler/crawler.py
