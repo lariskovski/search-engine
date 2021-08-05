@@ -45,7 +45,7 @@ def callback(ch, method, properties, body):
     # Creates MongoDB document
     result = collection.insert_one(data)
     # Logs in format: {'page': 'x', 'urls': ['y], '_id': ObjectId('1234')}
-    logging.info(data)
+    logging.info(f"Added entry: {data}")
 
 
 def main():
