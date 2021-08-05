@@ -36,12 +36,19 @@ def add_to_index(keyword: str, url: str) -> None:
         # Adds new keyword entry to index
         data   = { 'keyword': keyword, 'urls' : [url] }
         result = collection.insert_one(data)
-        logging.info(f"Added new entry: {keyword}: {url}")
+        logging.info(f"Added new entry: id: {result.inserted_id}, keyword: {keyword}, url {url}")
+        
     else:
         # Append to existing keyword urls' list
         result = collection.update_one({ "keyword": keyword },
                                        { "$addToSet": { "urls": url } }) # addToSet only adds if entry doesnt exist
-        logging.info(f"Appended to entry: {keyword}: {url}")
+        
+        # Logging-only logic
+        if result.modified_count == 0:
+            logging.info(f"Nothing to do. Entry already exists: keyword: {keyword}, url {url}")
+        else:
+            logging.info(f"RESULT {result.modified_count}")
+            logging.info(f"Appended to entry: keyword: {keyword}, url {url}")
 
 
 def add_page_to_index(url: str, content: str) -> None:
