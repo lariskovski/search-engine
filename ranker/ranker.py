@@ -1,8 +1,11 @@
 from dotenv import load_dotenv, find_dotenv
+from time import sleep
 import logging
 import pymongo
+import redis
 import os
 
+logging.basicConfig(level=logging.INFO)
 
 # MongoDB envs
 load_dotenv(find_dotenv())
@@ -15,8 +18,18 @@ MONGODB_PASS       = os.getenv('MONGODB_PASS')
 REDIS_HASH_NAME    = os.getenv('REDIS_HASH_NAME')
 REDIS_HOST         = os.getenv('REDIS_HOST')
 
+# Redis connection with retries
+retry_connection = True
+while retry_connection:
+    try:
+        pool = redis.ConnectionPool(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
+        hashtable = redis.Redis(connection_pool=pool)
+        retry_connection = False
 
-logging.basicConfig(level=logging.INFO)
+    except redis.exceptions.ConnectionError as e:
+        logging.error(e)
+        logging.info("Retrying connection to Redis in 1 second.")
+        sleep(1)
 
 
 def get_all_graphs()-> dict:
@@ -33,31 +46,8 @@ def get_all_graphs()-> dict:
     cursor =  collection.find({})
     graph = {k["page"]:k["urls"] for k in cursor}
     # Drops Collection
-    collection.drop()
+    # collection.drop()
     return graph
-
-
-def set_page_rank(page, rank) -> None:
-    '''Set page rank on Redis hashtable'''
-    import redis
-    from time import sleep
-
-    retry_connection = True
-
-    while retry_connection:
-        try:
-            pool = redis.ConnectionPool(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
-            hashtable = redis.Redis(connection_pool=pool)
-            # Create new rank entry
-            hashtable.hset(REDIS_HASH_NAME, page, rank)
-
-            logging.info(f"Successfully added page rank: {page}: {rank}")
-            retry_connection = False
-
-        except redis.exceptions.ConnectionError as e:
-            logging.error(e)
-            logging.info("Retrying connection to Redis in 1 second.")
-            sleep(1)
 
 
 def compute_ranks() -> None:
@@ -72,7 +62,6 @@ def compute_ranks() -> None:
 
     ranks: dict = {}
     total_pages_number: int = len(graph)
-
     
     for page in graph:
         # initializes ranks
@@ -94,7 +83,8 @@ def compute_ranks() -> None:
                     new_rank += DAMPING_FACTOR * (ranks[node] /len(graph[node]))
 
             # Set new rank on Redis
-            set_page_rank(page, new_rank)
+            hashtable.hset(REDIS_HASH_NAME, page, new_rank)
+            logging.info(f"Successfully added page rank: {page}: {new_rank}")
 
 
 if __name__ == "__main__":
