@@ -80,6 +80,8 @@ if __name__ == "__main__":
 
     @app.route('/url', methods = ['GET'])
     def get_urls_for_keyword():
+        ''' Returns all urls for given keyword
+        '''
         # curl localhost:5000/url?keyword=hummus
         keyword = request.args['keyword']
         response = collection.find_one({"keyword": keyword}) # if not found -> None
