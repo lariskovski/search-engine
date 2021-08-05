@@ -9,6 +9,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Redis envs
 load_dotenv(find_dotenv())
+RANKER_API_PORT = os.getenv('RANKER_API_PORT')
 REDIS_HASH_NAME = os.getenv('REDIS_HASH_NAME')
 REDIS_HOST      = os.getenv('REDIS_HOST')
 
@@ -32,7 +33,7 @@ if __name__ == "__main__":
 
     @app.route('/rank', methods = ['GET'])
     def get_page_rank():
-        # curl localhost:5000/rank?page=https://udacity.github.io/cs101x/urank/nickel.html
+        # curl localhost:7000/rank?page=https://udacity.github.io/cs101x/urank/nickel.html
         page = request.args['page']
         data = {
                 "page": page,
@@ -40,4 +41,4 @@ if __name__ == "__main__":
                 }
         return json.dumps(data)
 
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=RANKER_API_PORT, debug=True)
