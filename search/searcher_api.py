@@ -3,39 +3,33 @@ from flask import Flask, request
 import requests, json
 import os, time
 import logging
-import pymongo
 
-# MongoDB envs
+# API calls envs
 load_dotenv(find_dotenv())
-MONGODB_COLLECTION = os.getenv('MONGODB_COLLECTION')
-MONGODB_CLUSTER    = os.getenv('MONGODB_CLUSTER')
-MONGODB_DB_NAME    = os.getenv('MONGODB_DB_NAME')
-MONGODB_USER       = os.getenv('MONGODB_USER')
-MONGODB_PASS       = os.getenv('MONGODB_PASS')
-
-RANK_API           =os.getenv('RANK_API')
+INDEX_API = os.getenv('INDEX_API')
+RANK_API  = os.getenv('RANK_API')
 
 logging.basicConfig(level=logging.INFO)
 
-# MongoDB config
-try:
-    client     = pymongo.MongoClient(f"mongodb+srv://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_CLUSTER}/")
-    db         = client[MONGODB_DB_NAME]
-    collection = db[MONGODB_COLLECTION]
-
-except ServerSelectionTimeoutError as e:
-    stderr.write(f"Could not connect to MongoDB: {e}")
-
 
 def lookup(keyword:str) -> dict:
-    ''' Looks for keyword on indexer collection, returns entry if exists otherwise, None'''
-    response = collection.find_one({"keyword": keyword}) # if not found -> None
-    if response == None:
-        logging.info(f"Not found index entry: {keyword}")
-        return None
-    else:
-        logging.info(f"Found entry: {response}")
-        return response['urls']
+    ''' Asks Index API for the urls of keyword, returns entry if exists otherwise, None'''
+    retry_api_connection = True
+    while retry_api_connection:
+        try:
+            request = requests.get(INDEX_API + "/url", params={ 'keyword': keyword })
+            response  = json.loads(request.text)
+            logging.debug(f"Successfully connected to {INDEX_API}")
+            retry_api_connection = False
+
+        except Exception as e:
+            logging.critical(f"Could not connect to {INDEX_API} - {e}")
+            logging.info(f"Retrying connection to {INDEX_API}")
+            time.sleep(1)
+
+    keyword, urls = response['keyword'], response['urls']
+    logging.debug(f"Found urls for {keyword}: {urls}")
+    return urls
 
 
 def lookup_best(keyword: str) -> str:
@@ -51,7 +45,7 @@ def lookup_best(keyword: str) -> str:
             retry_api_connection = True
             while retry_api_connection:
                 try:
-                    request = requests.get(RANK_API + "/rank", params={ 'page': url })
+                    request   = requests.get(RANK_API + "/rank", params={ 'page': url })
                     response  = json.loads(request.text)
                     logging.debug(f"Successfully connected to {RANK_API}")
                     retry_api_connection = False
@@ -67,8 +61,8 @@ def lookup_best(keyword: str) -> str:
             logging.debug(f"Found rank for {url}: {rank}")
         
         # Sorts and returns best ranked page for the provided keyword
-        sorted_ranked_urls   = {k: v for k, v in sorted(unsorted_ranked_urls.items(), key=lambda item: item[1])}
-        best_ranked_url = sorted_ranked_urls.popitem()[0] # pop returns a list [ url, rank ]
+        sorted_ranked_urls = {k: v for k, v in sorted(unsorted_ranked_urls.items(), key=lambda item: item[1])}
+        best_ranked_url    = sorted_ranked_urls.popitem()[0] # pop returns a list [ url, rank ]
 
         return best_ranked_url
 
@@ -82,7 +76,7 @@ if __name__ == "__main__":
 
     @app.route('/search', methods = ['GET'])
     def get_best_url():
-        # curl localhost:5000/?keyword=hummus
+        # curl localhost:6000/search?keyword=hummus
         keyword = request.args['keyword']
         best_url = lookup_best(keyword)
         if best_url != '':
