@@ -5,6 +5,7 @@ import pymongo
 import json
 import os
 
+logging.basicConfig(level=logging.INFO)
 
 # MongoDB envs
 load_dotenv(find_dotenv())
@@ -24,24 +25,31 @@ except ServerSelectionTimeoutError as e:
 
 
 def add_to_index(keyword: str, url: str) -> None:
-    ''' Adds keyword and correspondent url to index hashtable if its not there'''
+    ''' Populates Mongo collection with a list of urls where a certain keyword appears.
 
+        Adds entry keyword:url if not there
+        Appends url to keyword entry already exists.
+    '''
     response = collection.find_one({"keyword": keyword}) # if not found -> None
     
     if response == None:
         # Adds new keyword entry to index
-        data   = { 'keyword': keyword, 'urls' : [u for u in url] }
+        data   = { 'keyword': keyword, 'urls' : [url] }
         result = collection.insert_one(data)
+        logging.info(f"Added new entry: {keyword}: {url}")
     else:
-        # Append to existing keyword urls list
+        # Append to existing keyword urls' list
         result = collection.update_one({ "keyword": keyword },
                                        { "$addToSet": { "urls": url } }) # addToSet only adds if entry doesnt exist
+        logging.info(f"Appended to entry: {keyword}: {url}")
 
 
 def add_page_to_index(url: str, content: str) -> None:
+    '''Formats all page content to no-HTML-tags text.
+       Calls add_to_index for each word: url mapping'''
     from helper.parser import PageParser
-    '''Formats all page content to no-HTML-tags text and passes each word into add_to_index()'''
 
+    # Strips HTML structure from content
     parser = PageParser()
     words  = parser.format_content(content).split()
 
